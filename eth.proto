@@ -1,0 +1,91 @@
+syntax = "proto3";
+package eth;
+
+// option go_package = "github.com/chainbound/fiber/protobuf/eth";
+
+import "google/protobuf/empty.proto";
+import "types.proto";
+
+message BlockNumber {
+  oneof block_number {
+    google.protobuf.Empty latest = 1;
+    google.protobuf.Empty pending = 2;
+    uint64 number = 3;
+  }
+}
+
+message BlockId {
+  oneof id {
+    types.H256 hash = 1;
+    BlockNumber number = 2;
+  }
+}
+
+message CanonicalTransactionData {
+  types.H256 block_hash = 1;
+  uint64 block_number = 2;
+  uint64 index = 3;
+}
+
+message AccessListItem {
+  types.H160 address = 1;
+  repeated types.H256 slots = 2;
+}
+
+
+// TODO: make eip1559 compatible + type
+message Transaction {
+  optional bytes to = 1;
+  uint64 gas = 2;
+  uint64 gas_price = 3;
+  bytes hash = 4;
+  bytes input = 5;
+  uint64 nonce = 6;
+  bytes value = 7;
+  bytes from = 8;
+  uint32 type = 9;
+  uint64 max_fee = 10; // = maxFeePerGas = GasFeeCap
+  uint64 priority_fee = 11; // = maxPriorityFeePerGas = GasTipCap
+  uint64 v = 12;
+  bytes r = 13;
+  bytes s = 14;
+  uint32 chainId = 15;
+}
+
+message StoredTransaction {
+  optional CanonicalTransactionData canonical_data = 1;
+  Transaction transaction = 2;
+}
+
+message Header {
+  uint64 number = 1;
+  bytes hash = 2;
+  bytes parent_hash = 3;
+  uint64 nonce = 4;
+  bytes uncle_hash = 5;
+  bytes state_root = 6;
+  bytes receipt_root = 7;
+  bytes coinbase = 8;
+  uint64 difficulty = 9;
+  optional uint64 total_difficulty = 10;
+  optional bytes extra_data = 11;
+  optional uint64 size = 12;
+  uint64 gas_limit = 13;
+  uint64 gas_used = 14;
+  uint64 timestamp = 15;
+}
+
+message Body {
+  repeated Transaction transactions = 1;
+  repeated bytes ommers = 2;
+}
+
+// message LightBlock {
+//   Header header = 1;
+//   repeated types.H256 transaction_hashes = 2;
+// }
+
+message Block {
+  Header header = 1;
+  Body body = 2;
+}

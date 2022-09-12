@@ -1,0 +1,35 @@
+syntax = "proto3";
+package api;
+
+// option go_package = "github.com/chainbound/fiber/protobuf/api";
+
+import "eth.proto";
+
+service API {
+    rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
+    rpc SubscribeNewBlocks (BlockFilter) returns (stream eth.Block) {}
+    rpc SendTransaction (eth.Transaction) returns (TransactionResponse) {}
+    // Backrun is the RPC method for backrunning a transaction.
+    rpc Backrun(BackrunMsg) returns (TransactionResponse) {}
+}
+
+message TxFilter {
+    string from = 1;
+    string to = 2;
+    // Value is 18 decimals, need bytes to store that much.
+    bytes value = 3;
+}
+
+message BlockFilter {
+    string producer = 1;
+}
+
+message TransactionResponse {
+    string hash = 1;
+    int64 timestamp = 2;
+}
+
+message BackrunMsg {
+    string hash = 1;
+    eth.Transaction tx = 2;
+}
