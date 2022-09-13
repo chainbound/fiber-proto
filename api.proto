@@ -9,6 +9,7 @@ service API {
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
     rpc SubscribeNewBlocks (BlockFilter) returns (stream eth.Block) {}
     rpc SendTransaction (eth.Transaction) returns (TransactionResponse) {}
+    rpc SendRawTransaction(RawTxMsg) returns (TransactionResponse) {}
     // Backrun is the RPC method for backrunning a transaction.
     rpc Backrun(BackrunMsg) returns (TransactionResponse) {}
 }
@@ -22,6 +23,10 @@ message TxFilter {
 
 message BlockFilter {
     string producer = 1;
+}
+
+message RawTxMsg {
+    bytes rawTx = 1;
 }
 
 message TransactionResponse {
