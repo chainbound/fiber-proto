@@ -12,6 +12,7 @@ service API {
     rpc SendRawTransaction(RawTxMsg) returns (TransactionResponse) {}
     // Backrun is the RPC method for backrunning a transaction.
     rpc Backrun(BackrunMsg) returns (TransactionResponse) {}
+    rpc RawBackrun(RawBackrunMsg) returns (TransactionResponse) {}
 }
 
 message TxFilter {
@@ -37,4 +38,9 @@ message TransactionResponse {
 message BackrunMsg {
     string hash = 1;
     eth.Transaction tx = 2;
+}
+
+message RawBackrunMsg {
+    string hash = 1;
+    bytes rawTx = 2;
 }
