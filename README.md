@@ -22,7 +22,7 @@ service API {
 
 In the wrapper, a couple of things need to happen:
 * The function argument should be an Ethereum object from the most common library in your language. For example, for JS this will be `ethers` / `web3.js`,
-for Golang it's `go-ethereum`, Rust would be `ethers-rs`, and for Python it's `web3.py`.
+for Golang it's `go-ethereum`, Rust would be `ethers-rs`, and for Python it's `web3.py`. This means that internally, the library object will have to be converted to an `eth` protobuf object.
 * The API key should be added to every request's metadata using the `x-api-key` tag. The way to do this will differ in each language.
 
 ## Examples
