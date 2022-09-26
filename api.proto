@@ -16,8 +16,8 @@ service API {
 }
 
 message TxFilter {
-    string from = 1;
-    string to = 2;
+    bytes from = 1;
+    bytes to = 2;
     // Value is 18 decimals, need bytes to store that much.
     bytes value = 3;
 }
