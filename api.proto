@@ -18,8 +18,8 @@ service API {
 message TxFilter {
     bytes from = 1;
     bytes to = 2;
-    // Value is 18 decimals, need bytes to store that much.
-    bytes value = 3;
+    // MethodID is the 4 bytes method identifier
+    bytes methodID = 3;
 }
 
 message BlockFilter {
