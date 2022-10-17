@@ -50,6 +50,12 @@ message Transaction {
   bytes r = 13;
   bytes s = 14;
   uint32 chainId = 15;
+  repeated AccessTuple access_list = 16;
+}
+
+message AccessTuple {
+  bytes address = 1;
+  repeated bytes storage_keys = 2;
 }
 
 message StoredTransaction {
