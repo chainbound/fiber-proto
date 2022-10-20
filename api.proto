@@ -8,6 +8,11 @@ import "eth.proto";
 service API {
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
     rpc SubscribeNewBlocks (BlockFilter) returns (stream eth.Block) {}
+    rpc SendTransaction (eth.Transaction) returns (TransactionResponse) {}
+    rpc SendRawTransaction(RawTxMsg) returns (TransactionResponse) {}
+    // Backrun is the RPC method for backrunning a transaction.
+    rpc Backrun(BackrunMsg) returns (TransactionResponse) {}
+    rpc RawBackrun(RawBackrunMsg) returns (TransactionResponse) {}
     rpc SendTransactionStream (stream eth.Transaction) returns (stream TransactionResponse) {}
     rpc SendRawTransactionStream(stream RawTxMsg) returns (stream TransactionResponse) {}
     // Backrun is the RPC method for backrunning a transaction.
