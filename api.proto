@@ -21,10 +21,7 @@ service API {
 }
 
 message TxFilter {
-    bytes from = 1;
-    bytes to = 2;
-    // MethodID is the 4 bytes method identifier
-    bytes methodID = 3;
+    bytes encoded = 1;
 }
 
 message BlockFilter {
