@@ -7,6 +7,7 @@ import "eth.proto";
 
 service API {
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
+    rpc SubscribeNewTxsV2 (TxFilterV2) returns (stream eth.Transaction) {}
     rpc SubscribeNewBlocks (BlockFilter) returns (stream eth.Block) {}
     rpc SendTransaction (eth.Transaction) returns (TransactionResponse) {}
     rpc SendRawTransaction(RawTxMsg) returns (TransactionResponse) {}
@@ -21,6 +22,13 @@ service API {
 }
 
 message TxFilter {
+    bytes from = 1;
+    bytes to = 2;
+    // MethodID is the 4 bytes method identifier
+    bytes methodID = 3;
+}
+
+message TxFilterV2 {
     bytes encoded = 1;
 }
 
