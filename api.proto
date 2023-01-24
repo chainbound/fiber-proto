@@ -7,28 +7,25 @@ import "eth.proto";
 
 service API {
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
-    rpc SubscribeNewTxsV2 (TxFilterV2) returns (stream eth.Transaction) {}
-    rpc SubscribeNewBlocks (BlockFilter) returns (stream eth.Block) {}
-    rpc SendTransaction (eth.Transaction) returns (TransactionResponse) {}
-    rpc SendRawTransaction(RawTxMsg) returns (TransactionResponse) {}
-    // Backrun is the RPC method for backrunning a transaction.
-    rpc Backrun(BackrunMsg) returns (TransactionResponse) {}
-    rpc RawBackrun(RawBackrunMsg) returns (TransactionResponse) {}
-    rpc SendTransactionStream (stream eth.Transaction) returns (stream TransactionResponse) {}
-    rpc SendRawTransactionStream(stream RawTxMsg) returns (stream TransactionResponse) {}
-    // Backrun is the RPC method for backrunning a transaction.
-    rpc BackrunStream(stream BackrunMsg) returns (stream TransactionResponse) {}
-    rpc RawBackrunStream(stream RawBackrunMsg) returns (stream TransactionResponse) {}
+    rpc SendTransaction(stream eth.Transaction) returns (stream TransactionResponse) {}
+    rpc SendRawTransaction(stream RawTxMsg) returns (stream TransactionResponse) {}
+    rpc SendTransactionSequence(stream TxSequenceMsg) returns (stream TxSequenceResponse) {}
+    rpc SendRawTransactionSequence(stream RawTxSequenceMsg) returns (stream TxSequenceResponse) {}
+}
+
+message TxSequenceMsg {
+    repeated eth.Transaction sequence = 1;
+}
+
+message RawTxSequenceMsg {
+    repeated bytes raw_txs = 1;
+}
+
+message TxSequenceResponse {
+    repeated TransactionResponse sequence_response = 1;
 }
 
 message TxFilter {
-    bytes from = 1;
-    bytes to = 2;
-    // MethodID is the 4 bytes method identifier
-    bytes methodID = 3;
-}
-
-message TxFilterV2 {
     bytes encoded = 1;
 }
 
