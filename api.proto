@@ -4,13 +4,21 @@ package api;
 // option go_package = "github.com/chainbound/fiber/protobuf/api";
 
 import "eth.proto";
+import "google/protobuf/empty.proto";
 
 service API {
+    // Opens a new transaction stream with the given filter.
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
-    rpc SendTransaction(stream eth.Transaction) returns (stream TransactionResponse) {}
-    rpc SendRawTransaction(stream RawTxMsg) returns (stream TransactionResponse) {}
-    rpc SendTransactionSequence(stream TxSequenceMsg) returns (stream TxSequenceResponse) {}
-    rpc SendRawTransactionSequence(stream RawTxSequenceMsg) returns (stream TxSequenceResponse) {}
+    // Sends a signed transaction to the network.
+    rpc SendTransaction (stream eth.Transaction) returns (stream TransactionResponse) {}
+    // Sends a signed, RLP encoded transaction to the network
+    rpc SendRawTransaction (stream RawTxMsg) returns (stream TransactionResponse) {}
+    // Sends a sequence of signed transactions to the network.
+    rpc SendTransactionSequence (stream TxSequenceMsg) returns (stream TxSequenceResponse) {}
+    // Sends a sequence of signed, RLP encoded transactions to the network.
+    rpc SendRawTransactionSequence (stream RawTxSequenceMsg) returns (stream TxSequenceResponse) {}
+    // Opens a new block stream.
+    rpc SubscribeNewBlocks (google.protobuf.Empty) returns (stream eth.Block) {}
 }
 
 message TxSequenceMsg {
