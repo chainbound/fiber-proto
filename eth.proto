@@ -33,7 +33,7 @@ message AccessListItem {
 }
 
 
-// TODO: make eip1559 compatible + type
+/// Typed transaction
 message Transaction {
   optional bytes to = 1;
   uint64 gas = 2;
@@ -42,7 +42,7 @@ message Transaction {
   bytes input = 5;
   uint64 nonce = 6;
   bytes value = 7;
-  bytes from = 8;
+  optional bytes from = 8;
   uint32 type = 9;
   uint64 max_fee = 10; // = maxFeePerGas = GasFeeCap
   uint64 priority_fee = 11; // = maxPriorityFeePerGas = GasTipCap
@@ -58,40 +58,19 @@ message AccessTuple {
   repeated bytes storage_keys = 2;
 }
 
-message StoredTransaction {
-  optional CanonicalTransactionData canonical_data = 1;
-  Transaction transaction = 2;
-}
-
-message Header {
+message Block {
   uint64 number = 1;
   bytes hash = 2;
   bytes parent_hash = 3;
-  uint64 nonce = 4;
-  bytes uncle_hash = 5;
-  bytes state_root = 6;
-  bytes receipt_root = 7;
-  bytes coinbase = 8;
-  uint64 difficulty = 9;
-  optional uint64 total_difficulty = 10;
-  optional bytes extra_data = 11;
-  optional uint64 size = 12;
-  uint64 gas_limit = 13;
-  uint64 gas_used = 14;
-  uint64 timestamp = 15;
-}
-
-message Body {
-  repeated Transaction transactions = 1;
-  repeated bytes ommers = 2;
-}
-
-// message LightBlock {
-//   Header header = 1;
-//   repeated types.H256 transaction_hashes = 2;
-// }
-
-message Block {
-  Header header = 1;
-  Body body = 2;
+  bytes prev_randao = 4;
+  bytes state_root = 5;
+  bytes receipt_root = 6;
+  bytes fee_recipient = 7;
+  optional bytes extra_data = 8;
+  uint64 gas_limit = 9;
+  uint64 gas_used = 10;
+  uint64 timestamp = 11;
+  bytes logs_bloom = 12;
+  bytes base_fee_per_gas = 13;
+  repeated Transaction transactions = 14;
 }
