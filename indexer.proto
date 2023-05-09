@@ -1,0 +1,65 @@
+syntax = "proto3";
+package indexer;
+
+import "google/protobuf/empty.proto";
+
+service Indexer {
+  rpc IndexTransactions(stream FiberTransactionMessage) returns (google.protobuf.Empty) {} 
+  rpc IndexBlocks(stream FiberBlockMessage) returns (google.protobuf.Empty) {}
+}
+
+enum ObservationType {
+  FIBER = 0;
+  P2P = 1;
+}
+
+message TransactionMessage {
+  string tx_hash = 1;
+  uint32 tx_type = 2;
+  uint64 gas = 3;
+  string gas_price = 4;
+  string max_fee_per_gas = 5;
+  string max_priority_fee_per_gas = 6;
+  string from = 7;
+  string to = 8;
+  string data = 9;
+  uint64 nonce = 10;
+  string value = 11;
+}
+
+// Represents a fiber transaction message that can be indexed. The bytes fields should be encoded
+// as hexadecimal strings, while the uint256 fields should be strings of the decimal representation.
+// Depending on the underlying database, it might be more space-efficient to store these as their original
+// representation. This will be especially true for the integer values.
+message FiberTransactionMessage {
+  uint64 timestamp = 1;
+  string node_id = 2;
+  string region = 3;
+  string source = 4;
+  uint32 priority = 5;
+  ObservationType observation_type = 6;
+  optional string api_key = 7;
+  TransactionMessage transaction = 8;
+}
+
+message FiberBlockMessage {
+  uint64 timestamp = 1;
+  string node_id = 2;
+  string region = 3;
+  string source = 4;
+  ObservationType observation_type = 5;
+  string block_hash = 6;
+  uint64 block_number = 7;
+  string parent_hash = 8;
+  string fee_recipient = 9;
+  string state_root = 10;
+  string receipts_root = 11;
+  string logs_bloom = 12;
+  uint64 gas_limit = 13;
+  uint64 gas_used = 14;
+  uint64 base_fee_per_gas = 15;
+  uint64 block_timestamp = 16;
+  string extra_data = 17;
+  string transactions_root = 18;
+  repeated TransactionMessage transactions = 19;
+}
