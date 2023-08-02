@@ -17,8 +17,13 @@ service API {
     rpc SendTransactionSequence (stream TxSequenceMsg) returns (stream TxSequenceResponse) {}
     // Sends a sequence of signed, RLP encoded transactions to the network.
     rpc SendRawTransactionSequence (stream RawTxSequenceMsg) returns (stream TxSequenceResponse) {}
-    // Opens a new block stream.
-    rpc SubscribeNewBlocks (google.protobuf.Empty) returns (stream eth.Block) {}
+    // Opens a stream of new execution payloads.
+    rpc SubscribeExecutionPayloads (google.protobuf.Empty) returns (stream eth.ExecutionPayload) {}
+    // Opens a stream of new execution payload headers.
+    rpc SubscribeExecutionHeaders (google.protobuf.Empty) returns (stream eth.ExecutionPayloadHeader) {}
+    // Opens a stream of new beacon blocks. The beacon blocks are "compacted", meaning that the
+    // execution payload is not included.
+    rpc SubscribeBeaconBlocks (google.protobuf.Empty) returns (stream eth.CompactBeaconBlock) {}
 }
 
 message TxSequenceMsg {
@@ -48,14 +53,4 @@ message RawTxMsg {
 message TransactionResponse {
     string hash = 1;
     int64 timestamp = 2;
-}
-
-message BackrunMsg {
-    string hash = 1;
-    eth.Transaction tx = 2;
-}
-
-message RawBackrunMsg {
-    string hash = 1;
-    bytes rawTx = 2;
 }
