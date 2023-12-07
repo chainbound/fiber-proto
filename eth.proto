@@ -7,70 +7,254 @@ import "google/protobuf/empty.proto";
 import "types.proto";
 
 message BlockNumber {
-  oneof block_number {
-    google.protobuf.Empty latest = 1;
-    google.protobuf.Empty pending = 2;
-    uint64 number = 3;
-  }
+    oneof block_number {
+        google.protobuf.Empty latest = 1;
+        google.protobuf.Empty pending = 2;
+        uint64 number = 3;
+    }
 }
 
 message BlockId {
-  oneof id {
-    types.H256 hash = 1;
-    BlockNumber number = 2;
-  }
+    oneof id {
+        types.H256 hash = 1;
+        BlockNumber number = 2;
+    }
 }
 
 message CanonicalTransactionData {
-  types.H256 block_hash = 1;
-  uint64 block_number = 2;
-  uint64 index = 3;
+    types.H256 block_hash = 1;
+    uint64 block_number = 2;
+    uint64 index = 3;
 }
 
 message AccessListItem {
-  types.H160 address = 1;
-  repeated types.H256 slots = 2;
+    types.H160 address = 1;
+    repeated types.H256 slots = 2;
 }
 
 
 /// Typed transaction
 message Transaction {
-  optional bytes to = 1;
-  uint64 gas = 2;
-  uint64 gas_price = 3;
-  bytes hash = 4;
-  bytes input = 5;
-  uint64 nonce = 6;
-  bytes value = 7;
-  optional bytes from = 8;
-  uint32 type = 9;
-  uint64 max_fee = 10; // = maxFeePerGas = GasFeeCap
-  uint64 priority_fee = 11; // = maxPriorityFeePerGas = GasTipCap
-  uint64 v = 12;
-  bytes r = 13;
-  bytes s = 14;
-  uint32 chainId = 15;
-  repeated AccessTuple access_list = 16;
+    optional bytes to = 1;
+    uint64 gas = 2;
+    uint64 gas_price = 3;
+    bytes hash = 4;
+    bytes input = 5;
+    uint64 nonce = 6;
+    bytes value = 7;
+    optional bytes from = 8;
+    uint32 type = 9;
+    uint64 max_fee = 10; // = maxFeePerGas = GasFeeCap
+    uint64 priority_fee = 11; // = maxPriorityFeePerGas = GasTipCap
+    uint64 v = 12;
+    bytes r = 13;
+    bytes s = 14;
+    uint32 chainId = 15;
+    repeated AccessTuple access_list = 16;
 }
 
 message AccessTuple {
-  bytes address = 1;
-  repeated bytes storage_keys = 2;
+    bytes address = 1;
+    repeated bytes storage_keys = 2;
 }
 
-message Block {
-  uint64 number = 1;
-  bytes hash = 2;
-  bytes parent_hash = 3;
-  bytes prev_randao = 4;
-  bytes state_root = 5;
-  bytes receipt_root = 6;
-  bytes fee_recipient = 7;
-  optional bytes extra_data = 8;
-  uint64 gas_limit = 9;
-  uint64 gas_used = 10;
-  uint64 timestamp = 11;
-  bytes logs_bloom = 12;
-  bytes base_fee_per_gas = 13;
-  repeated Transaction transactions = 14;
+// An execution payload
+// Last update: Capella
+// We don't include the withdrawals because we're not interested in them
+// and they add some overhead.
+message ExecutionPayload {
+    // The execution payload header
+    ExecutionPayloadHeader header = 1;
+    repeated Transaction transactions = 2;
+}
+
+
+// The execution payload header: https://github.com/ethereum/consensus-specs/blob/dev/specs/capella/beacon-chain.md#executionpayloadheader
+// Last update: Capella
+message ExecutionPayloadHeader {
+    bytes parent_hash = 1;
+    bytes fee_recipient = 2;
+    bytes state_root = 3;
+    bytes receipts_root = 4;
+    bytes logs_bloom = 5;
+    bytes prev_randao = 6;
+    uint64 block_number = 7;
+    uint64 gas_limit = 8;
+    uint64 gas_used = 9;
+    uint64 timestamp = 10;
+    bytes extra_data = 11;
+    // Big endian encoded U256
+    bytes base_fee_per_gas = 12;
+    bytes block_hash = 13;
+    bytes transactions_root = 14;
+    // Only: Capella
+    optional bytes withdrawals_root = 15;
+}
+
+// ================== CONSENSUS LAYER MESSAGES ================== //
+
+// The beacon block: https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#beaconblock
+// Last update: Phase0
+message BeaconBlock {
+    uint64 slot = 1;
+    uint64 proposer_index = 2;
+    bytes parent_root = 3;
+    bytes state_root = 4;
+    BeaconBlockBody body = 5;
+}
+
+// Type that follows [`BeaconBlock`] but without the execution payload, relying
+// on [`CompactBeaconBlockBody`] instead.
+message CompactBeaconBlock {
+    uint64 slot = 1;
+    uint64 proposer_index = 2;
+    bytes parent_root = 3;
+    bytes state_root = 4;
+    CompactBeaconBlockBody body = 5;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#signedbeaconblock
+message SignedBeaconBlock {
+    BeaconBlock message = 1;
+    bytes signature = 2;
+}
+
+// The beacon block body: https://github.com/ethereum/consensus-specs/blob/dev/specs/capella/beacon-chain.md#beaconblockbody
+// Last update: Capella
+message BeaconBlockBody {
+    bytes randao_reveal = 1;
+    Eth1Data eth1_data = 2;
+    bytes graffiti = 3;
+    repeated ProposerSlashing proposer_slashings = 4;
+    repeated AttesterSlashing attester_slashings = 5;
+    repeated Attestation attestations = 6;
+    repeated Deposit deposits = 7;
+    repeated SignedVoluntaryExit voluntary_exits = 8;
+    SyncAggregate sync_aggregate = 9;
+    ExecutionPayload execution_payload = 10;
+    // Only: Capella
+    repeated SignedBLSToExecutionChange bls_to_execution_changes = 11;
+}
+
+// Custom type that follows [`BeaconBlockBody`] but without the execution payload.
+message CompactBeaconBlockBody {
+    bytes randao_reveal = 1;
+    Eth1Data eth1_data = 2;
+    bytes graffiti = 3;
+    repeated ProposerSlashing proposer_slashings = 4;
+    repeated AttesterSlashing attester_slashings = 5;
+    repeated Attestation attestations = 6;
+    repeated Deposit deposits = 7;
+    repeated SignedVoluntaryExit voluntary_exits = 8;
+    SyncAggregate sync_aggregate = 9;
+    // Only: Capella
+    repeated SignedBLSToExecutionChange bls_to_execution_changes = 10;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#signedbeaconblockheader
+message SignedBeaconBlockHeader {
+    BeaconBlockHeader message = 1;
+    bytes signature = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#beaconblockheader
+message BeaconBlockHeader {
+    uint64 slot = 1;
+    uint64 proposer_index = 2;
+    bytes parent_root = 3;
+    bytes state_root = 4;
+    bytes body_root = 5;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#eth1data
+message Eth1Data {
+    bytes deposit_root = 1;
+    uint64 deposit_count = 2;
+    bytes block_hash = 3;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#signedvoluntaryexit
+message SignedVoluntaryExit {
+    VoluntaryExit message = 1;
+    bytes signature = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#voluntaryexit
+message VoluntaryExit {
+    uint64 epoch = 1;
+    uint64 validator_index = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#proposerslashing
+message ProposerSlashing {
+    SignedBeaconBlockHeader header_1 = 1;
+    SignedBeaconBlockHeader header_2 = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#proposerslashing
+message AttesterSlashing {
+    IndexedAttestation attestation_1 = 1;
+    IndexedAttestation attestation_2 = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#indexedattestation
+message IndexedAttestation {
+    repeated uint64 attesting_indices = 1;
+    AttestationData data = 2;
+    bytes signature = 3;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#attestationdata
+message AttestationData {
+    uint64 slot = 1;
+    uint64 index = 2;
+    bytes beacon_block_root = 3;
+    Checkpoint source = 4;
+    Checkpoint target = 5;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#checkpoint
+message Checkpoint {
+    uint64 epoch = 1;
+    bytes root = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#attestation
+message Attestation {
+    bytes aggregation_bits = 1;
+    AttestationData data = 2;
+    bytes signature = 3;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#deposit
+message Deposit {
+    repeated bytes proof = 1;
+    DepositData data = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/beacon-chain.md#depositdata
+message DepositData {
+    bytes pubkey = 1;
+    bytes withdrawal_credentials = 2;
+    uint64 amount = 3;
+    bytes signature = 4;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/altair/beacon-chain.md#syncaggregate
+message SyncAggregate {
+    bytes sync_committee_bits = 1;
+    bytes sync_committee_signature = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/capella/beacon-chain.md#signedblstoexecutionchange
+message SignedBLSToExecutionChange {
+    BLSToExecutionChange message = 1;
+    bytes signature = 2;
+}
+
+// https://github.com/ethereum/consensus-specs/blob/dev/specs/capella/beacon-chain.md#blstoexecutionchange
+message BLSToExecutionChange {
+    uint64 validator_index = 1;
+    bytes from_bls_pubkey = 2;
+    bytes to_execution_address = 3;
 }
