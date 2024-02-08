@@ -81,6 +81,8 @@ message BlockSubmissionMsg {
 message TransactionMsg {
     /// The enveloped, RLP-encoded transaction bytes.
     bytes rlp_transaction = 1;
+    /// The address of the sender / signer.
+    bytes sender = 2;
 }
 
 /// An SSZ encoded execution payload.
