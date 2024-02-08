@@ -9,7 +9,7 @@ service API {
     // TODO: Deprecate
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
     // Opens a new transaction stream with the given filter.
-    rpc SubscribeNewTxsV2 (TxFilter) returns (stream TransactionMsg) {}
+    rpc SubscribeNewTxsV2 (TxFilter) returns (stream TransactionWithSenderMsg) {}
     // Sends a signed transaction to the network.
     // TODO: Deprecate
     rpc SendTransaction (stream eth.Transaction) returns (stream TransactionResponse) {}
@@ -79,6 +79,11 @@ message BlockSubmissionMsg {
 
 /// An enveloped, RLP-encoded transaction.
 message TransactionMsg {
+    /// The enveloped, RLP-encoded transaction bytes.
+    bytes rlp_transaction = 1;
+}
+
+message TransactionWithSenderMsg {
     /// The enveloped, RLP-encoded transaction bytes.
     bytes rlp_transaction = 1;
     /// The address of the sender / signer.
