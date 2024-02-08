@@ -1,11 +1,17 @@
 syntax = "proto3";
 package indexer;
 
+import "eth.proto";
 import "google/protobuf/empty.proto";
 
 service Indexer {
-  rpc IndexTransactions(stream FiberTransactionMessage) returns (google.protobuf.Empty) {} 
-  rpc IndexBlocks(stream FiberBlockMessage) returns (google.protobuf.Empty) {}
+  // Old streams (< Fiber v0.1.13)
+  rpc IndexTransactionsV2(stream FiberTransactionMessageV2) returns (google.protobuf.Empty) {}
+  rpc IndexBlocksV2(stream FiberBlockMessageV2) returns (google.protobuf.Empty) {}
+
+  // New streams (Fiber v0.1.13)
+  rpc IndexTransactionsV3(stream TransactionMessage) returns (google.protobuf.Empty) {}
+  rpc IndexBlocksV3(stream BlockMessage) returns (google.protobuf.Empty) {}
 }
 
 enum ObservationType {
@@ -13,25 +19,70 @@ enum ObservationType {
   P2P = 1;
 }
 
-message TransactionMessage {
-  string tx_hash = 1;
-  uint32 tx_type = 2;
-  uint64 gas = 3;
-  string gas_price = 4;
-  string max_fee_per_gas = 5;
-  string max_priority_fee_per_gas = 6;
-  string from = 7;
-  string to = 8;
-  string data = 9;
-  uint64 nonce = 10;
-  string value = 11;
+message APISource {
+    string api_key = 1;
+    string remote_addr = 2;
 }
+
+message P2PSource {
+    bytes peer_id = 1;
+    string peer_addr = 2;
+}
+
+message FiberSource {
+    string node_id = 1;
+}
+
+// ================= V3 stream types ==================== //
+message TransactionMessage {
+    uint64 timestamp = 1;
+    // The node ID of the current node
+    string node_id = 2;
+    // The region of the current node
+    string region = 3;
+    // The environment of the current node
+    string env = 4;
+    // The sender of the transaction
+    bytes sender = 5;
+    // The enveloped, RLP encoded transaction
+    bytes rlp_transaction = 6;
+    // The transaction priority
+    uint32 priority = 7;
+    // The source of the transaction
+    oneof source {
+        APISource api = 8;
+        P2PSource p2p = 9;
+        FiberSource fiber = 10;
+    }
+}
+
+message BlockMessage {
+    uint64 timestamp = 1;
+    // The node ID of the current node
+    string node_id = 2;
+    // The region of the current node
+    string region = 3;
+    // The environment of the current node
+    string env = 4;
+    // The SSZ encoded block
+    bytes ssz_block = 5;
+    // The block priority
+    uint32 priority = 6;
+    // The source of the block
+    oneof source {
+        APISource api = 7;
+        P2PSource p2p = 8;
+        FiberSource fiber = 9;
+    }
+}
+
+// ================== NEW TYPES ==================
 
 // Represents a fiber transaction message that can be indexed. The bytes fields should be encoded
 // as hexadecimal strings, while the uint256 fields should be strings of the decimal representation.
 // Depending on the underlying database, it might be more space-efficient to store these as their original
 // representation. This will be especially true for the integer values.
-message FiberTransactionMessage {
+message FiberTransactionMessageV2 {
   uint64 timestamp = 1;
   string node_id = 2;
   string region = 3;
@@ -39,27 +90,17 @@ message FiberTransactionMessage {
   uint32 priority = 5;
   ObservationType observation_type = 6;
   optional string api_key = 7;
-  TransactionMessage transaction = 8;
+  eth.Transaction transaction = 8;
+  optional string env = 9;
 }
 
-message FiberBlockMessage {
+// Full consensus layer block message. This also contains the execution payload.
+message FiberBlockMessageV2 {
   uint64 timestamp = 1;
   string node_id = 2;
   string region = 3;
   string source = 4;
   ObservationType observation_type = 5;
-  string block_hash = 6;
-  uint64 block_number = 7;
-  string parent_hash = 8;
-  string fee_recipient = 9;
-  string state_root = 10;
-  string receipts_root = 11;
-  string logs_bloom = 12;
-  uint64 gas_limit = 13;
-  uint64 gas_used = 14;
-  uint64 base_fee_per_gas = 15;
-  uint64 block_timestamp = 16;
-  string extra_data = 17;
-  string transactions_root = 18;
-  repeated TransactionMessage transactions = 19;
+  optional string env = 6;
+  eth.BeaconBlock block = 7;
 }

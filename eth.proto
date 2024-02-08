@@ -4,34 +4,6 @@ package eth;
 // option go_package = "github.com/chainbound/fiber/protobuf/eth";
 
 import "google/protobuf/empty.proto";
-import "types.proto";
-
-message BlockNumber {
-    oneof block_number {
-        google.protobuf.Empty latest = 1;
-        google.protobuf.Empty pending = 2;
-        uint64 number = 3;
-    }
-}
-
-message BlockId {
-    oneof id {
-        types.H256 hash = 1;
-        BlockNumber number = 2;
-    }
-}
-
-message CanonicalTransactionData {
-    types.H256 block_hash = 1;
-    uint64 block_number = 2;
-    uint64 index = 3;
-}
-
-message AccessListItem {
-    types.H160 address = 1;
-    repeated types.H256 slots = 2;
-}
-
 
 /// Typed transaction
 message Transaction {
