@@ -96,7 +96,10 @@ message ExecutionPayloadMsg {
 }
 
 message EmptyBeaconBlockMsg {
-    bytes ssz_block = 1;
+    // The beacon block version.
+    uint32 data_version = 1;
+    // The SSZ encoded, empty beacon block.
+    bytes ssz_block = 2;
 }
 
 message BlockSubmissionResponse {

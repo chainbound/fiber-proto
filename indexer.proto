@@ -64,15 +64,17 @@ message BlockMessage {
     string region = 3;
     // The environment of the current node
     string env = 4;
+    // Data version of the block
+    uint32 data_version = 5;
     // The SSZ encoded block
-    bytes ssz_block = 5;
+    bytes ssz_block = 6;
     // The block priority
-    uint32 priority = 6;
+    uint32 priority = 7;
     // The source of the block
     oneof source {
-        APISource api = 7;
-        P2PSource p2p = 8;
-        FiberSource fiber = 9;
+        APISource api = 8;
+        P2PSource p2p = 9;
+        FiberSource fiber = 10;
     }
 }
 
