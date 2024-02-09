@@ -32,10 +32,9 @@ service API {
     rpc SubscribeExecutionHeaders (google.protobuf.Empty) returns (stream eth.ExecutionPayloadHeader) {}
     // Opens a stream of new beacon blocks. The beacon blocks are "compacted", meaning that the
     // execution payload is not included.
-    // TODO: Deprecate
     rpc SubscribeBeaconBlocks (google.protobuf.Empty) returns (stream eth.CompactBeaconBlock) {}
-    // Opens a stream of new empty beacon blocks. These beacon blocks contain everything except list of transactions.
-    rpc SubscribeEmptyBeaconBlocks (google.protobuf.Empty) returns (stream EmptyBeaconBlockMsg) {}
+    // Opens a stream of new beacon blocks.
+    rpc SubscribeBeaconBlocksV2 (google.protobuf.Empty) returns (stream BeaconBlockMsg) {}
     // Opens a bi-directional stream for new block submissions. The client stream is used to send
     // SSZ-encoded beacon blocks, and the server stream is used to send back the state_root, slot and
     // a local timestamp as a confirmation that the block was seen and handled.
@@ -95,10 +94,10 @@ message ExecutionPayloadMsg {
     bytes ssz_payload = 1;
 }
 
-message EmptyBeaconBlockMsg {
+message BeaconBlockMsg {
     // The beacon block version.
     uint32 data_version = 1;
-    // The SSZ encoded, empty beacon block.
+    // The SSZ encoded beacon block.
     bytes ssz_block = 2;
 }
 
