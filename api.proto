@@ -91,7 +91,10 @@ message TransactionWithSenderMsg {
 
 /// An SSZ encoded execution payload.
 message ExecutionPayloadMsg {
-    bytes ssz_payload = 1;
+    // The fork data version.
+    uint32 data_version = 1;
+    // The SSZ encoded execution payload.
+    bytes ssz_payload = 2;
 }
 
 message BeaconBlockMsg {
