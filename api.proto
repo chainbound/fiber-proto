@@ -10,6 +10,8 @@ service API {
     rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
     // Opens a new transaction stream with the given filter.
     rpc SubscribeNewTxsV2 (TxFilter) returns (stream TransactionWithSenderMsg) {}
+    // Opens a new blob transaction stream with the given filter.
+    rpc SubscribeNewBlobTxs (google.protobuf.Empty) returns (stream TransactionWithSenderMsg) {}
     // Sends a signed transaction to the network.
     // TODO: Deprecate
     rpc SendTransaction (stream eth.Transaction) returns (stream TransactionResponse) {}
