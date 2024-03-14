@@ -6,7 +6,7 @@ import "google/protobuf/empty.proto";
 service Indexer {
   rpc IndexTransactionsV3(stream TransactionMessage) returns (google.protobuf.Empty) {}
   rpc IndexBlocksV3(stream BlockMessage) returns (google.protobuf.Empty) {}
-  rpc IndexBlobSidecar(stream BlobSidecarMessage) returns (google.protobuf.Empty) {}
+  rpc IndexBlobSidecars(stream BlobSidecarMessage) returns (google.protobuf.Empty) {}
 }
 
 enum ObservationType {
@@ -28,7 +28,6 @@ message FiberSource {
     string node_id = 1;
 }
 
-// ================= V3 stream types ==================== //
 message TransactionMessage {
     uint64 timestamp = 1;
     // The node ID of the current node
