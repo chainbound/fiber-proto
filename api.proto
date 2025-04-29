@@ -1,56 +1,31 @@
 syntax = "proto3";
 package api;
 
-import "eth.proto";
 import "google/protobuf/empty.proto";
 
 service API {
     // Opens a new transaction stream with the given filter.
-    // TODO: Deprecate
-    rpc SubscribeNewTxs (TxFilter) returns (stream eth.Transaction) {}
-    // Opens a new transaction stream with the given filter.
     rpc SubscribeNewTxsV2 (TxFilter) returns (stream TransactionWithSenderMsg) {}
+
     // Opens a new blob transaction stream with the given filter.
     rpc SubscribeNewBlobTxs (google.protobuf.Empty) returns (stream TransactionWithSenderMsg) {}
+
     // Sends a signed transaction to the network.
-    // TODO: Deprecate
-    rpc SendTransaction (stream eth.Transaction) returns (stream TransactionResponse) {}
-    // Sends a signed, RLP encoded transaction to the network
-    // TODO: Deprecate
-    rpc SendRawTransaction (stream RawTxMsg) returns (stream TransactionResponse) {}
     rpc SendTransactionV2 (stream TransactionMsg) returns (stream TransactionResponse) {}
-    // Sends a sequence of signed transactions to the network.
-    // TODO: Deprecate
-    rpc SendTransactionSequence (stream TxSequenceMsg) returns (stream TxSequenceResponse) {}
-    rpc SendTransactionSequenceV2 (stream TxSequenceMsgV2) returns (stream TxSequenceResponse) {}
+
     // Sends a sequence of signed, RLP encoded transactions to the network.
     rpc SendRawTransactionSequence (stream RawTxSequenceMsg) returns (stream TxSequenceResponse) {}
+
     // Opens a stream of new execution payloads.
-    // TODO: Deprecate
-    rpc SubscribeExecutionPayloads (google.protobuf.Empty) returns (stream eth.ExecutionPayload) {}
     rpc SubscribeExecutionPayloadsV2 (google.protobuf.Empty) returns (stream ExecutionPayloadMsg) {}
-    // Opens a stream of new execution payload headers.
-    // TODO: Deprecate
-    rpc SubscribeExecutionHeaders (google.protobuf.Empty) returns (stream eth.ExecutionPayloadHeader) {}
-    // Opens a stream of new beacon blocks. The beacon blocks are "compacted", meaning that the
-    // execution payload is not included.
-    rpc SubscribeBeaconBlocks (google.protobuf.Empty) returns (stream eth.CompactBeaconBlock) {}
+
     // Opens a stream of new beacon blocks.
     rpc SubscribeBeaconBlocksV2 (google.protobuf.Empty) returns (stream BeaconBlockMsg) {}
+
     // Opens a bi-directional stream for new block submissions. The client stream is used to send
     // SSZ-encoded beacon blocks, and the server stream is used to send back the state_root, slot and
     // a local timestamp as a confirmation that the block was seen and handled.
     rpc SubmitBlockStream (stream BlockSubmissionMsg) returns (stream BlockSubmissionResponse) {}
-}
-
-message TxSequenceMsg {
-    repeated eth.Transaction sequence = 1;
-}
-
-/// A message containing a sequence of enveloped, RLP-encoded transactions.
-message TxSequenceMsgV2 {
-    /// list of enveloped, RLP-encoded transaction bytes.
-    repeated bytes sequence = 1;
 }
 
 message RawTxSequenceMsg {
@@ -61,17 +36,8 @@ message TxSequenceResponse {
     repeated TransactionResponse sequence_response = 1;
 }
 
-
 message TxFilter {
     bytes encoded = 1;
-}
-
-message BlockFilter {
-    string producer = 1;
-}
-
-message RawTxMsg {
-    bytes rawTx = 1;
 }
 
 message BlockSubmissionMsg {
