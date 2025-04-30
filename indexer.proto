@@ -1,17 +1,12 @@
 syntax = "proto3";
 package indexer;
 
-import "eth.proto";
 import "google/protobuf/empty.proto";
 
 service Indexer {
-  // Old streams (< Fiber v0.1.13)
-  rpc IndexTransactionsV2(stream FiberTransactionMessageV2) returns (google.protobuf.Empty) {}
-  rpc IndexBlocksV2(stream FiberBlockMessageV2) returns (google.protobuf.Empty) {}
-
-  // New streams (Fiber v0.1.13)
   rpc IndexTransactionsV3(stream TransactionMessage) returns (google.protobuf.Empty) {}
   rpc IndexBlocksV3(stream BlockMessage) returns (google.protobuf.Empty) {}
+  rpc IndexBlobSidecars(stream BlobSidecarMessage) returns (google.protobuf.Empty) {}
 }
 
 enum ObservationType {
@@ -33,7 +28,6 @@ message FiberSource {
     string node_id = 1;
 }
 
-// ================= V3 stream types ==================== //
 message TransactionMessage {
     uint64 timestamp = 1;
     // The node ID of the current node
@@ -78,31 +72,37 @@ message BlockMessage {
     }
 }
 
-// ================== NEW TYPES ==================
-
-// Represents a fiber transaction message that can be indexed. The bytes fields should be encoded
-// as hexadecimal strings, while the uint256 fields should be strings of the decimal representation.
-// Depending on the underlying database, it might be more space-efficient to store these as their original
-// representation. This will be especially true for the integer values.
-message FiberTransactionMessageV2 {
+// Blob Sidecar message, as gossiped by the Consensus Layer
+message BlobSidecarMessage {
   uint64 timestamp = 1;
+  // The node ID of the current node
   string node_id = 2;
+  // The region of the current node
   string region = 3;
-  string source = 4;
-  uint32 priority = 5;
-  ObservationType observation_type = 6;
-  optional string api_key = 7;
-  eth.Transaction transaction = 8;
-  optional string env = 9;
-}
-
-// Full consensus layer block message. This also contains the execution payload.
-message FiberBlockMessageV2 {
-  uint64 timestamp = 1;
-  string node_id = 2;
-  string region = 3;
-  string source = 4;
-  ObservationType observation_type = 5;
-  optional string env = 6;
-  eth.BeaconBlock block = 7;
+  // The environment of the current node
+  string env = 4;
+  // The index of the blob
+  uint64 index = 5;
+  // The raw blob data
+  bytes blob = 6;
+  // The KZG commitment of the blob
+  bytes kzg_commitment = 7;
+  // The KZG proof of the blob
+  bytes kzg_proof = 8;
+  // The consensus slot number
+  uint64 slot = 9;
+  // The proposer index
+  uint64 proposer_index = 10;
+  // The parent root
+  bytes parent_root = 11;
+  // The state root
+  bytes state_root = 12;
+  // The beacon block body root
+  bytes body_root = 13;
+  // The source of the blob sidecar
+  oneof source {
+    APISource api = 14;
+    P2PSource p2p = 15;
+    FiberSource fiber = 16;
+  }
 }
